@@ -3,419 +3,295 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Counterparty Verification - Registry Cross‑Check (Mock Demo)</title>
+  <title>Yoti Onboarding – Registry Cross‑Check (Mock Demo)</title>
   <style>
-    :root {
-      --bg: #0f172a;        /* slate-900 */
-      --card: #111827;      /* gray-900 */
-      --ink: #e5e7eb;       /* gray-200 */
-      --ink-dim: #9ca3af;   /* gray-400 */
-      --accent: #3b82f6;    /* blue-500 */
-      --success: #10b981;   /* emerald-500 */
-      --danger: #ef4444;    /* red-500 */
-      --warning: #f59e0b;   /* amber-500 */
-      --muted: #1f2937;     /* gray-800 */
+    :root{
+      --bg:#f8fafc;           /* light slate-50 */
+      --card:#ffffff;         /* white */
+      --ink:#0f172a;          /* slate-900 */
+      --ink-dim:#475569;      /* slate-600 */
+      --accent:#1463ff;       /* Yoti-like blue */
+      --accent-ink:#ffffff;   
+      --success:#059669;      /* green-600 */
+      --warn:#d97706;         /* amber-600 */
+      --err:#dc2626;          /* red-600 */
+      --line:#e2e8f0;         /* slate-200 */
+      --soft:#f1f5f9;         /* slate-100 */
+      --shadow:0 12px 30px rgba(15,23,42,.08);
     }
-    * { box-sizing: border-box; }
-    html, body { height: 100%; }
-    body {
-      margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, "Apple Color Emoji", "Segoe UI Emoji";
-      background: linear-gradient(180deg, #0b1220, #0f172a 40% 60%, #0b1220);
-      color: var(--ink);
-    }
-    .wrap { max-width: 880px; margin: 0 auto; padding: 24px; }
-    header { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
-    .brand { display: flex; align-items: center; gap: 10px; }
-    .logo { width: 36px; height: 36px; display: grid; place-items: center; border-radius: 10px; background: radial-gradient(circle at 30% 30%, #60a5fa, #3b82f6 60%, #1e40af); box-shadow: 0 10px 30px rgba(59,130,246,.35); font-weight: 800; }
-    .logo span { font-size: 18px; letter-spacing: .5px; }
-    .brand h1 { font-size: 16px; margin: 0; line-height: 1.2; }
-    .subtitle { color: var(--ink-dim); font-size: 13px; margin-top: 2px; }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Noto Sans",Arial; color:var(--ink); background:var(--bg)}
+    .wrap{max-width:880px;margin:0 auto;padding:20px}
+    header{display:flex;align-items:center;gap:12px;justify-content:space-between}
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{width:40px;height:40px;border-radius:10px;display:grid;place-items:center;background:linear-gradient(160deg,#73a3ff,#1463ff);color:#fff;font-weight:800;box-shadow:0 8px 20px rgba(20,99,255,.3)}
+    .brand h1{font-size:18px;margin:0}
+    .subtitle{color:var(--ink-dim);font-size:13px;margin-top:2px}
 
-    .card {
-      background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 16px; padding: 20px; box-shadow: 0 20px 50px rgba(0,0,0,.45);
-    }
-    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-    @media (max-width: 720px) { .grid { grid-template-columns: 1fr; } header { flex-direction: column; align-items: flex-start; } }
+    .topbar{margin-top:12px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;box-shadow:var(--shadow);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+    .ticker{display:flex;gap:8px;flex-wrap:wrap}
+    .step{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;border:1px solid var(--line);background:var(--soft);font-size:12px;color:var(--ink-dim)}
+    .step.ok{background:#ecfdf5;border-color:#bbf7d0;color:#065f46}
+    .step.run{background:#eff6ff;border-color:#bfdbfe;color:#1e40af}
+    .dot{width:10px;height:10px;border-radius:50%;background:var(--line)}
+    .dot.run{background:#60a5fa}
+    .dot.ok{background:#34d399}
 
-    label { font-size: 13px; color: var(--ink-dim); margin-bottom: 6px; display: block; }
-    input, select {
-      width: 100%; padding: 12px 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);
-      background: #0b1020; color: var(--ink); outline: none;
-    }
-    input:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(59,130,246,.15); }
+    .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:var(--shadow)}
+    h2{margin:0 0 10px 0;font-size:16px}
+    label{display:block;font-size:13px;color:var(--ink-dim);margin-bottom:6px}
+    input,select{width:100%;padding:12px;border-radius:12px;border:1px solid var(--line);background:#fff;color:var(--ink);outline:none;transition:box-shadow .2s,border-color .2s}
+    input:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(20,99,255,.15)}
+    .field{margin-bottom:12px}
 
-    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-    @media (max-width: 720px) { .row { grid-template-columns: 1fr; } }
+    .btn{appearance:none;border:none;cursor:pointer;background:var(--accent);color:var(--accent-ink);padding:12px 16px;border-radius:12px;font-weight:700;box-shadow:0 8px 22px rgba(20,99,255,.25)}
+    .btn.secondary{background:#fff;color:var(--ink);border:1px solid var(--line);box-shadow:none}
 
-    .actions { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
-    button {
-      appearance: none; border: none; cursor: pointer;
-      background: var(--accent); color: white; padding: 12px 16px; border-radius: 12px; font-weight: 700;
-      box-shadow: 0 10px 24px rgba(59,130,246,.35);
-    }
-    button.secondary { background: #111827; color: var(--ink); border: 1px solid rgba(255,255,255,.1); box-shadow: none; }
-    button.ghost { background: transparent; border: 1px dashed rgba(255,255,255,.25); color: var(--ink-dim); }
+    .matches{margin-top:14px;display:none}
+    .match{border:1px solid var(--line);border-radius:12px;padding:12px;background:#fbfdff}
+    .match + .match{margin-top:8px}
+    .pill{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border-radius:999px;border:1px solid var(--line);background:#fff;font-size:12px;color:var(--ink-dim)}
 
-    .hint { font-size: 12px; color: var(--ink-dim); margin-top: 6px; }
+    .foot{margin-top:14px;font-size:12px;color:var(--ink-dim)}
 
-    .status { margin-top: 14px; font-size: 14px; }
-    .badge { display: inline-flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 999px; border: 1px solid rgba(255,255,255,.1); background: #0b1020; }
+    /* Autofill highlight */
+    .flash{animation:flash .9s ease}
+    @keyframes flash{0%{box-shadow:0 0 0 0 rgba(20,99,255,.0)}50%{box-shadow:0 0 0 6px rgba(20,99,255,.25)}100%{box-shadow:0 0 0 0 rgba(20,99,255,.0)}}
 
-    .results { margin-top: 18px; display: none; }
-    .result-item { padding: 14px; border-radius: 12px; background: #0b1020; border: 1px solid rgba(255,255,255,.08); margin-top: 12px; }
-
-    .ok { color: var(--success); }
-    .warn { color: var(--warning); }
-    .err { color: var(--danger); }
-
-    .small { font-size: 12px; color: var(--ink-dim); }
-    .footnote { margin-top: 18px; font-size: 12px; color: var(--ink-dim); }
-    .muted { color: var(--ink-dim); }
-
-    .spinner {
-      width: 18px; height: 18px; border: 2px solid rgba(255,255,255,.2); border-top-color: #fff; border-radius: 50%;
-      animation: spin 0.9s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    .sample-box { margin-top: 10px; padding: 10px; border-radius: 12px; background: rgba(255,255,255,.03); border: 1px dashed rgba(255,255,255,.12); }
-    .samples { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
-    .chip { font-size: 12px; padding: 6px 10px; border-radius: 999px; background: #111827; border: 1px solid rgba(255,255,255,.15); cursor: pointer; }
+    /* Mobile first layout: fields are stacked vertically */
+    .grid{display:grid;grid-template-columns:1fr;gap:12px}
   </style>
 </head>
 <body>
   <div class="wrap">
     <header>
       <div class="brand">
-        <div class="logo" aria-hidden="true"><span>GD</span></div>
+        <div class="logo" aria-hidden="true">YT</div>
         <div>
-          <h1>Counterparty Verification – Registry Cross‑Check (Mock)</h1>
-          <div class="subtitle">Real‑time check of user against officers and shareholders in business registries – demo simulation powered by Global Database</div>
+          <h1>Yoti Onboarding – Registry Cross‑Check (Mock)</h1>
+          <div class="subtitle">Frictionless applicant capture with background KYB enrichment via Global Database (simulated)</div>
         </div>
       </div>
     </header>
 
-    <main style="margin-top: 18px;">
-      <section class="card" aria-labelledby="form-title">
-        <h2 id="form-title" style="margin:0 0 10px 0; font-size: 18px;">Onboarding form – what your user would see</h2>
-        <div class="grid">
-          <div>
-            <label for="fullName">Full name</label>
-            <input id="fullName" autocomplete="name" placeholder="Type a full name" />
-          </div>
-          <div>
-            <label for="company">Company name</label>
-            <input id="company" autocomplete="organization" placeholder="Type a company name" />
-          </div>
-          <div>
-            <label for="country">Country</label>
-            <select id="country">
-              <option value="GB">United Kingdom</option>
-              <option value="IE">Ireland</option>
-              <option value="FR">France</option>
-              <option value="DE">Germany</option>
-            </select>
-            <div class="hint">Country scoping improves match precision.
-            </div>
-          </div>
-          <div>
-            <label for="dob">Date of birth – optional</label>
-            <input id="dob" type="date" />
-            <div class="hint">Used to disambiguate common names.
-            </div>
-          </div>
+    <!-- Background status ticker -->
+    <div class="topbar" aria-live="polite">
+      <strong style="font-size:13px">Background:</strong>
+      <div class="ticker" id="ticker"></div>
+    </div>
+
+    <!-- Matches appear above the form once enrichment completes -->
+    <section class="card matches" id="matches">
+      <h2>Possible company matches for applicant</h2>
+      <div id="matchList"></div>
+    </section>
+
+    <!-- Application form: vertical, mobile-friendly -->
+    <main class="card" style="margin-top:12px" aria-labelledby="form-title">
+      <h2 id="form-title">Applicant details</h2>
+      <form class="grid" onsubmit="return false;">
+        <div class="field"><label for="first">First name</label><input id="first" autocomplete="given-name" /></div>
+        <div class="field"><label for="last">Last name</label><input id="last" autocomplete="family-name" /></div>
+        <div class="field"><label for="email">Email</label><input id="email" type="email" autocomplete="email" /></div>
+        <div class="field"><label for="phone">Phone</label><input id="phone" type="tel" autocomplete="tel" /></div>
+        <div class="field"><label for="dob">Date of birth</label><input id="dob" type="date" /></div>
+        <div class="field"><label for="country">Country</label>
+          <select id="country">
+            <option value="GB">United Kingdom</option>
+            <option value="IE">Ireland</option>
+            <option value="FR">France</option>
+            <option value="DE">Germany</option>
+          </select>
         </div>
-
-        <div class="actions" style="margin-top: 16px;">
-          <button id="verifyBtn" type="button">Verify against registry</button>
-          <button id="resetBtn" type="button" class="secondary">Reset</button>
-          <button id="prefill1" type="button" class="ghost">Quick fill example A</button>
-          <button id="prefill2" type="button" class="ghost">Quick fill example B</button>
-        </div>
-
-        <div class="status" id="status" aria-live="polite" style="min-height: 32px; display:flex; align-items:center; gap:10px;"></div>
-
-        <div class="results" id="results">
-          <!-- Results will be injected here -->
-        </div>
-
-        <div class="footnote">This is a front‑end only simulation – no personal data is sent anywhere. The sample registry below is fictional, created for demonstration. In production, this would call the Global Database API in your backend and return signed results.</div>
-      </section>
-
-      <section class="card" style="margin-top: 16px;">
-        <h3 style="margin-top:0; font-size: 16px;">What is being checked</h3>
-        <p class="muted">The verification checks if the person appears as an <strong>officer</strong> or <strong>shareholder</strong> of the named company in the selected country. It also validates that the company exists and is active.</p>
-
-        <div class="sample-box">
-          <div class="small">Try these examples exactly as shown</div>
-          <div class="samples" id="sampleChips"></div>
-        </div>
-      </section>
-
-      <section class="card" style="margin-top: 16px;">
-        <h3 style="margin: 0 0 8px 0; font-size: 16px;">Sample registry dataset used in this mock</h3>
-        <p class="small">Fictional records for demo only</p>
-        <div id="dataPreview" class="small"></div>
-      </section>
-
+        <div class="field"><label for="addr1">Address line 1</label><input id="addr1" autocomplete="address-line1" /></div>
+        <div class="field"><label for="addr2">Address line 2 (optional)</label><input id="addr2" autocomplete="address-line2" /></div>
+        <div class="field"><label for="city">City</label><input id="city" autocomplete="address-level2" /></div>
+        <div class="field"><label for="state">County / State / Region</label><input id="state" autocomplete="address-level1" /></div>
+        <div class="field"><label for="post">Postcode</label><input id="post" autocomplete="postal-code" /></div>
+        <div class="field"><button id="verifyBtn" class="btn" type="button">Verify now (manual)</button> <button id="resetBtn" class="btn secondary" type="button">Reset</button></div>
+      </form>
+      <div class="foot">Demo only – static front‑end simulation. In production, these values would be posted to Yoti backend, which calls the Global Database API and returns signed results.</div>
     </main>
 
-    <footer style="margin: 18px 0 40px 0;" class="small muted">
-      © <span id="year"></span> Global Database – Registry‑sourced company data demo. Not affiliated with Yoti. For demonstration only.
-    </footer>
+    <footer class="foot">© <span id="year"></span> Yoti mock for demo purposes. Global Database registry cross‑check simulated. Not affiliated with Yoti.</footer>
   </div>
 
   <script>
-    // --- Demo dataset: fictional, UK‑flavoured entries --- //
-    // Each company has: name, country, status, officers[], shareholders[], optional dob for disambiguation
+    const $ = (id) => document.getElementById(id);
+
+    // Fictional registry
     const REGISTRY = [
       {
-        company: "Northbridge Identity Ltd",
-        country: "GB",
-        status: "Active",
-        officers: [
-          { name: "Kamila Hart", role: "Director", dob: "1988-03-14" },
-          { name: "David Nwosu", role: "Director", dob: "1985-11-09" }
+        company:"Riverbank Payments UK Ltd",
+        country:"GB",
+        status:"Active",
+        officers:[
+          { name:"Alice Bennett", role:"CFO", dob:"1986-10-05" },
+          { name:"Mark Stokes", role:"CEO", dob:"1979-05-22" }
         ],
-        shareholders: [
-          { name: "Kamila Hart", shares: "40%" },
-          { name: "Yusuf Patel", shares: "60%" }
+        shareholders:[
+          { name:"Alice Bennett", shares:"15%" },
+          { name:"Harbor Ventures LLP", shares:"85%" }
         ]
       },
       {
-        company: "Riverbank Payments UK Ltd",
-        country: "GB",
-        status: "Active",
-        officers: [
-          { name: "Mark Stokes", role: "CEO", dob: "1979-05-22" },
-          { name: "Alice Bennett", role: "CFO", dob: "1986-10-05" }
-        ],
-        shareholders: [
-          { name: "Alice Bennett", shares: "15%" },
-          { name: "Harbor Ventures LLP", shares: "85%" }
-        ]
-      },
-      {
-        company: "Bright Ledger Solutions Limited",
-        country: "IE",
-        status: "Active",
-        officers: [
-          { name: "Finn O'Rourke", role: "Director", dob: "1984-02-01" }
-        ],
-        shareholders: [
-          { name: "Finn O'Rourke", shares: "100%" }
-        ]
-      },
-      {
-        company: "HexaTrust SAS",
-        country: "FR",
-        status: "Active",
-        officers: [
-          { name: "Élodie Marchand", role: "Présidente", dob: "1990-07-19" }
-        ],
-        shareholders: [
-          { name: "Élodie Marchand", shares: "35%" },
-          { name: "Alain Robert", shares: "65%" }
-        ]
-      },
-      {
-        company: "Bergwerk Daten GmbH",
-        country: "DE",
-        status: "Dissolved",
-        officers: [
-          { name: "Johannes Keller", role: "Geschäftsführer", dob: "1976-01-12" }
-        ],
-        shareholders: [
-          { name: "Johannes Keller", shares: "100%" }
-        ]
+        company:"Northbridge Identity Ltd",
+        country:"GB",
+        status:"Active",
+        officers:[ { name:"Kamila Hart", role:"Director", dob:"1988-03-14" } ],
+        shareholders:[ { name:"Yusuf Patel", shares:"60%" }, { name:"Kamila Hart", shares:"40%" } ]
       }
     ];
 
-    const EXAMPLES = [
-      { fullName: "Alice Bennett", company: "Riverbank Payments UK Ltd", country: "GB", dob: "1986-10-05" },
-      { fullName: "Kamila Hart", company: "Northbridge Identity Ltd", country: "GB", dob: "1988-03-14" },
-      { fullName: "Finn O'Rourke", company: "Bright Ledger Solutions Limited", country: "IE", dob: "1984-02-01" }
-    ];
+    // Demo applicant to auto-type
+    const APPLICANT = {
+      first:"Alice",
+      last:"Bennett",
+      email:"alice.bennett@example.com",
+      phone:"+44 20 7946 1234",
+      dob:"1986-10-05",
+      country:"GB",
+      addr1:"221B Baker Street",
+      addr2:"",
+      city:"London",
+      state:"Greater London",
+      post:"NW1 6XE"
+    };
 
-    const $ = (id) => document.getElementById(id);
-    const fmt = (s) => (s || "").trim().toLowerCase();
-
-    const status = $("status");
-    const results = $("results");
-
-    function setStatus(kind, text, showSpinner=false) {
-      status.innerHTML = "";
-      const badge = document.createElement("div");
-      badge.className = "badge";
-      if (showSpinner) {
-        const spin = document.createElement("div");
-        spin.className = "spinner";
-        badge.appendChild(spin);
-      }
-      const span = document.createElement("span");
-      span.textContent = text;
-      if (kind === "ok") span.classList.add("ok");
-      if (kind === "warn") span.classList.add("warn");
-      if (kind === "err") span.classList.add("err");
-      badge.appendChild(span);
-      status.appendChild(badge);
+    function setVal(id, val){
+      const el = $(id);
+      el.value = val;
+      el.classList.remove('flash');
+      // trigger reflow to restart animation
+      void el.offsetWidth;
+      el.classList.add('flash');
     }
 
-    function renderResults(items) {
-      results.style.display = "block";
-      results.innerHTML = "";
-      if (!items || !items.length) {
-        const box = document.createElement("div");
-        box.className = "result-item";
-        box.innerHTML = `<div class="err"><strong>No registry match found</strong></div>
-          <div class="small">Tip: try one of the quick-fill examples above. In production, broader graph search would check group structures and historic roles.</div>`;
-        results.appendChild(box);
-        return;
-      }
-      for (const it of items) {
-        const box = document.createElement("div");
-        box.className = "result-item";
-        box.innerHTML = `
-          <div style="display:flex; justify-content:space-between; gap:10px; align-items:center;">
-            <div>
-              <div style="font-weight:700;">${it.company} – ${it.country}</div>
-              <div class="small ${it.status === 'Active' ? 'ok' : 'warn'}">Status: ${it.status}</div>
-            </div>
-            <div class="small">Match type: <strong>${it.matchType}</strong></div>
-          </div>
-          <div class="small" style="margin-top:8px;">Person: <strong>${it.person}</strong>${it.dob ? `, DOB ${it.dob}` : ''}</div>
-          ${it.role ? `<div class="small">Officer role: ${it.role}</div>` : ''}
-          ${it.shares ? `<div class="small">Shareholding: ${it.shares}</div>` : ''}
-        `;
-        results.appendChild(box);
-      }
+    function addStep(label, cls){
+      const t = $("ticker");
+      const s = document.createElement('div');
+      s.className = 'step ' + (cls||'');
+      const dot = document.createElement('div'); dot.className = 'dot ' + (cls||'');
+      const span = document.createElement('span'); span.textContent = label;
+      s.appendChild(dot); s.appendChild(span); t.appendChild(s);
+      // keep most recent visible
+      t.scrollLeft = t.scrollWidth;
+      return s;
     }
 
-    function verify() {
-      const name = fmt($("fullName").value);
-      const company = fmt($("company").value);
+    function clearTicker(){ $("ticker").innerHTML = ""; }
+
+    function runEnrichment(){
+      clearTicker();
+      const s1 = addStep('Applicant info received', 'ok');
+      const s2 = addStep('Running registry enrichment…', 'run');
+
+      // simulate network latency
+      setTimeout(()=>{
+        s2.classList.remove('run'); s2.classList.add('ok');
+        s2.querySelector('.dot').classList.remove('run'); s2.querySelector('.dot').classList.add('ok');
+        addStep('Response from Global Database received', 'ok');
+        // auto-complete remaining fields
+        autoCompleteFromRegistry();
+      }, 900);
+    }
+
+    function findMatches(){
+      const full = `${$("first").value}`.trim() + ' ' + `${$("last").value}`.trim();
       const country = $("country").value;
-      const dobValue = $("dob").value ? $("dob").value : null;
-
-      results.style.display = "none";
-
-      if (!name || !company) {
-        setStatus("err", "Please enter full name and company to verify.");
-        return;
+      const matches = [];
+      for(const rec of REGISTRY){
+        if(rec.country !== country) continue;
+        // officer match
+        for(const o of rec.officers){
+          if(o.name.toLowerCase() === full.toLowerCase()){
+            matches.push({company:rec.company,country:rec.country,status:rec.status,matchType:'Officer',person:o.name,role:o.role,dob:o.dob});
+          }
+        }
+        // shareholder match
+        for(const sh of rec.shareholders){
+          if(sh.name.toLowerCase() === full.toLowerCase()){
+            matches.push({company:rec.company,country:rec.country,status:rec.status,matchType:'Shareholder',person:sh.name,shares:sh.shares});
+          }
+        }
       }
-
-      setStatus("warn", "Checking registry…", true);
-
-      // Simulate network latency
-      setTimeout(() => {
-        const matched = [];
-        for (const rec of REGISTRY) {
-          if (rec.country !== country) continue;
-          if (fmt(rec.company) !== company) continue;
-
-          // Officers
-          for (const off of rec.officers) {
-            if (fmt(off.name) === name && (!dobValue || off.dob === dobValue)) {
-              matched.push({ company: rec.company, country: rec.country, status: rec.status, person: off.name, dob: off.dob || null, role: off.role, matchType: "Officer" });
-            }
-          }
-          // Shareholders
-          for (const sh of rec.shareholders) {
-            if (fmt(sh.name) === name && (!dobValue || null)) {
-              matched.push({ company: rec.company, country: rec.country, status: rec.status, person: sh.name, shares: sh.shares, matchType: "Shareholder" });
-            }
-          }
-        }
-
-        if (matched.length) {
-          setStatus("ok", `Verified in registry – ${matched.length} match${matched.length>1?'es':''} found`);
-        } else {
-          setStatus("err", "No match in registry records for provided inputs.");
-        }
-        renderResults(matched);
-      }, 750);
+      return matches;
     }
 
-    function resetForm() {
-      $("fullName").value = "";
-      $("company").value = "";
-      $("country").value = "GB";
-      $("dob").value = "";
-      results.style.display = "none";
-      status.innerHTML = "";
-    }
-
-    function prefill(ex) {
-      $("fullName").value = ex.fullName;
-      $("company").value = ex.company;
-      $("country").value = ex.country;
-      $("dob").value = ex.dob || "";
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    // UTM echo – shows where the prospect came from if you include UTM in the email link
-    function echoUTM() {
-      const params = new URLSearchParams(location.search);
-      const known = ["utm_source","utm_medium","utm_campaign","utm_content","utm_term"];
-      const found = [];
-      known.forEach(k => { if (params.get(k)) found.push(`${k}=${params.get(k)}`); });
-      if (found.length) {
+    function renderMatches(list){
+      const box = $("matches");
+      const tgt = $("matchList");
+      tgt.innerHTML = '';
+      if(!list.length){ box.style.display='none'; return; }
+      for(const m of list){
         const div = document.createElement('div');
-        div.className = 'small';
-        div.style.marginTop = '8px';
-        div.textContent = `Tracking: ${found.join(' · ')}`;
-        document.querySelector('header').appendChild(div);
+        div.className = 'match';
+        div.innerHTML = `
+          <div style="display:flex;justify-content:space-between;gap:12px;align-items:center;">
+            <div>
+              <strong>${m.company}</strong>
+              <div class="pill" style="margin-top:6px;">Status: ${m.status}</div>
+            </div>
+            <div class="pill">Match: <strong style="margin-left:4px">${m.matchType}</strong></div>
+          </div>
+          <div style="margin-top:8px;font-size:13px;color:var(--ink-dim)">Person: <strong style="color:var(--ink)">${m.person}</strong>${m.dob?`, DOB ${m.dob}`:''}${m.role?`, Role ${m.role}`:''}${m.shares?`, Shares ${m.shares}`:''}</div>
+        `;
+        tgt.appendChild(div);
       }
+      box.style.display='block';
     }
 
-    // Populate sample chips and data preview
-    function initSamples() {
-      const chips = $("sampleChips");
-      EXAMPLES.forEach((ex, i) => {
-        const c = document.createElement("button");
-        c.type = "button"; c.className = "chip";
-        c.textContent = `${ex.fullName} – ${ex.company} (${ex.country})`;
-        c.addEventListener('click', () => prefill(ex));
-        chips.appendChild(c);
-      });
+    function autoTypeSequence(){
+      // Clear fields
+      ['first','last','email','phone','dob','country','addr1','addr2','city','state','post'].forEach(id=>{ $(id).value=''; });
 
-      const prev = $("dataPreview");
-      const tbl = document.createElement('table');
-      tbl.style.width = '100%';
-      tbl.style.borderCollapse = 'collapse';
-      tbl.style.marginTop = '8px';
+      // Step 1: type basic fields
+      setTimeout(()=>{ setVal('first', APPLICANT.first); }, 200);
+      setTimeout(()=>{ setVal('last', APPLICANT.last); }, 500);
+      setTimeout(()=>{ $("country").value = APPLICANT.country; $("country").classList.add('flash'); }, 800);
+      setTimeout(()=>{ setVal('addr1', APPLICANT.addr1); }, 1100);
 
-      const head = document.createElement('tr');
-      ["Company","Country","Status","Officers","Shareholders"].forEach(h => {
-        const th = document.createElement('th'); th.textContent = h; th.style.textAlign='left'; th.style.padding='6px 4px'; th.style.borderBottom='1px solid rgba(255,255,255,.15)'; th.style.fontSize='12px'; th.style.color='var(--ink-dim)'; tbl.appendChild(head); head.appendChild(th);
-      });
+      // Then show enrichment ticker and finish rest
+      setTimeout(()=>{ runEnrichment(); }, 1300);
+    }
 
-      REGISTRY.forEach(r => {
-        const tr = document.createElement('tr');
-        const tds = [
-          r.company,
-          r.country,
-          r.status,
-          r.officers.map(o=>`${o.name}${o.role?` (${o.role})`:''}${o.dob?` · DOB ${o.dob}`:''}`).join('; '),
-          r.shareholders.map(s=>`${s.name}${s.shares?` ${s.shares}`:''}`).join('; ')
-        ];
-        tds.forEach(v => { const td = document.createElement('td'); td.textContent = v; td.style.padding='8px 4px'; td.style.borderBottom='1px solid rgba(255,255,255,.08)'; td.style.fontSize='12px'; tr.appendChild(td); });
-        tbl.appendChild(tr);
-      });
-      prev.appendChild(tbl);
+    function autoCompleteFromRegistry(){
+      // Fill remaining visible fields smoothly
+      setTimeout(()=>{ setVal('email', APPLICANT.email); }, 200);
+      setTimeout(()=>{ setVal('phone', APPLICANT.phone); }, 400);
+      setTimeout(()=>{ setVal('dob', APPLICANT.dob); }, 600);
+      setTimeout(()=>{ setVal('addr2', APPLICANT.addr2); }, 700);
+      setTimeout(()=>{ setVal('city', APPLICANT.city); }, 850);
+      setTimeout(()=>{ setVal('state', APPLICANT.state); }, 1000);
+      setTimeout(()=>{ setVal('post', APPLICANT.post); }, 1150);
+
+      // Compute matches and show
+      setTimeout(()=>{ renderMatches(findMatches()); }, 1200);
+    }
+
+    function manualVerify(){
+      renderMatches(findMatches());
+      runEnrichment();
+    }
+
+    function resetForm(){
+      ['first','last','email','phone','dob','addr1','addr2','city','state','post'].forEach(id=>$(id).value='');
+      $("country").value='GB';
+      $("matches").style.display='none';
+      clearTicker();
     }
 
     // Wire up
-    $("verifyBtn").addEventListener('click', verify);
+    $("verifyBtn").addEventListener('click', manualVerify);
     $("resetBtn").addEventListener('click', resetForm);
-    $("prefill1").addEventListener('click', () => prefill(EXAMPLES[0]));
-    $("prefill2").addEventListener('click', () => prefill(EXAMPLES[1]));
     $("year").textContent = new Date().getFullYear();
 
-    initSamples();
-    echoUTM();
+    // Auto-demo on load
+    window.addEventListener('load', ()=>{
+      autoTypeSequence();
+    });
   </script>
 </body>
 </html>
+
