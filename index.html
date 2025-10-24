@@ -79,6 +79,8 @@
     <div class="topbar" aria-live="polite">
       <strong style="font-size:13px">Background:</strong>
       <div class="ticker" id="ticker"></div>
+      <button id="playDemo" class="btn secondary" type="button" style="margin-left:auto;padding:8px 12px;border-radius:10px">Play demo ▶</button>
+    </div>
     </div>
 
     <!-- Matches appear above the form once enrichment completes -->
@@ -304,9 +306,13 @@
     $("year").textContent = new Date().getFullYear();
 
     // Auto-demo on load
-    window.addEventListener('load', ()=>{
-      autoTypeSequence();
-    });
+    // robust start, even if some events were missed
+    function startDemoOnce(){ if(window.__demoStarted) return; window.__demoStarted = true; autoTypeSequence(); }
+    document.addEventListener('DOMContentLoaded', startDemoOnce);
+    window.addEventListener('load', startDemoOnce);
+    document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='visible') startDemoOnce(); });
+    setTimeout(startDemoOnce, 1500);
+    $("playDemo").addEventListener('click', startDemoOnce);
       // helpers for pacing
     function waitMs(ms){ return new Promise(res=>setTimeout(res, ms)); }
     function typeInto(id, text, perChar=60){
