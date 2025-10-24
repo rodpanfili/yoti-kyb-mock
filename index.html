@@ -108,6 +108,7 @@
           <div class="field"><label for="dob">Date of birth</label><input id="dob" type="date" /></div>
           <div class="field"><label for="country">Country</label>
             <select id="country">
+              <option value="CZ">Czechia</option>
               <option value="GB">United Kingdom</option>
               <option value="IE">Ireland</option>
               <option value="FR">France</option>
@@ -117,7 +118,7 @@
           <div class="field"><label for="addr1">Address line 1</label><input id="addr1" autocomplete="address-line1" /></div>
           <div class="field"><label for="addr2">Address line 2 (optional)</label><input id="addr2" autocomplete="address-line2" /></div>
           <div class="field"><label for="city">City</label><input id="city" autocomplete="address-level2" /></div>
-          <div class="field"><label for="state">County / State / Region</label><input id="state" autocomplete="address-level1" /></div>
+          <div class="field"><label for="state">Region</label><input id="state" autocomplete="address-level1" /></div>
           <div class="field"><label for="post">Postcode</label><input id="post" autocomplete="postal-code" /></div>
           <div class="field"><button id="verifyBtn" class="btn" type="button">Verify now (manual)</button> <button id="resetBtn" class="btn secondary" type="button">Reset</button></div>
         </form>
@@ -137,43 +138,43 @@
   <script>
     const $ = (id) => document.getElementById(id);
 
-    // Fictional registry
+    // Fictional registry – Czechia focus
     const REGISTRY = [
       {
-        company:"Riverbank Payments UK Ltd",
-        country:"GB",
+        company:"Vltava Payments s.r.o.",
+        country:"CZ",
         status:"Active",
         officers:[
-          { name:"Alice Bennett", role:"CFO", dob:"1986-10-05" },
-          { name:"Mark Stokes", role:"CEO", dob:"1979-05-22" }
+          { name:"Jana Nováková", role:"CFO", dob:"1990-04-15" },
+          { name:"Petr Svoboda", role:"CEO", dob:"1982-09-03" }
         ],
         shareholders:[
-          { name:"Alice Bennett", shares:"15%" },
-          { name:"Harbor Ventures LLP", shares:"85%" }
+          { name:"Jana Nováková", shares:"20%" },
+          { name:"Central Capital a.s.", shares:"80%" }
         ]
       },
       {
-        company:"Northbridge Identity Ltd",
-        country:"GB",
+        company:"Pražská Identita a.s.",
+        country:"CZ",
         status:"Active",
-        officers:[ { name:"Kamila Hart", role:"Director", dob:"1988-03-14" } ],
-        shareholders:[ { name:"Yusuf Patel", shares:"60%" }, { name:"Kamila Hart", shares:"40%" } ]
+        officers:[ { name:"Tomáš Dvořák", role:"Předseda představenstva", dob:"1985-01-22" } ],
+        shareholders:[ { name:"Jana Nováková", shares:"5%" }, { name:"Blue Square Ventures s.r.o.", shares:"95%" } ]
       }
     ];
 
-    // Demo applicant to auto-type
+    // Demo applicant to auto-type – Czech profile
     const APPLICANT = {
-      first:"Alice",
-      last:"Bennett",
-      email:"alice.bennett@example.com",
-      phone:"+44 20 7946 1234",
-      dob:"1986-10-05",
-      country:"GB",
-      addr1:"221B Baker Street",
+      first:"Jana",
+      last:"Nováková",
+      email:"jana.novakova@example.cz",
+      phone:"+420 212 345 678",
+      dob:"1990-04-15",
+      country:"CZ",
+      addr1:"Na Příkopě 14",
       addr2:"",
-      city:"London",
-      state:"Greater London",
-      post:"NW1 6XE"
+      city:"Praha",
+      state:"Hlavní město Praha",
+      post:"110 00"
     };
 
     function setVal(id, val){
@@ -262,7 +263,6 @@
       slideDown(box, 2000);
     }
 
-    // FIXED: removed stray parentheses that caused SyntaxError
     function autoCompleteFromRegistry(){
       setTimeout(()=>{ setVal('email', APPLICANT.email); }, 800);
       setTimeout(()=>{ setVal('phone', APPLICANT.phone); }, 1500);
@@ -290,7 +290,7 @@
     function manualVerify(){ renderMatches(findMatches()); runEnrichment(); }
     function resetForm(){
       ['first','last','email','phone','dob','addr1','addr2','city','state','post'].forEach(id=>{ const el=$(id); if(el) el.value=''; });
-      const c=$("country"); if(c) c.value='GB';
+      const c=$("country"); if(c) c.value='CZ';
       const m=$("matches"); if(m) m.style.display='none';
       clearTicker();
     }
@@ -338,9 +338,9 @@
         catch(e){ results.push({name, pass:false, detail:e.message}); }
       }
       t('Functions present', ()=> typeof typeInto==='function' && typeof runEnrichment==='function' && typeof autoCompleteFromRegistry==='function');
-      t('Registry contents', ()=> Array.isArray(REGISTRY) && REGISTRY.length===2 && REGISTRY.some(r=>r.company.includes('Riverbank')) && REGISTRY.some(r=>r.company.includes('Northbridge')));
-      t('Applicant defaults', ()=> APPLICANT.first==='Alice' && APPLICANT.country==='GB');
-      t('Match rendering', ()=>{ $("first").value=APPLICANT.first; $("last").value=APPLICANT.last; $("country").value=APPLICANT.country; renderMatches(findMatches()); return $("matches").style.display==='block'; });
+      t('Registry contents (CZ)', ()=> Array.isArray(REGISTRY) && REGISTRY.length===2 && REGISTRY.some(r=>r.company.includes('Vltava')) && REGISTRY.some(r=>r.company.includes('Pražská')));
+      t('Applicant defaults (CZ)', ()=> APPLICANT.first==='Jana' && APPLICANT.country==='CZ');
+      t('Match rendering (CZ)', ()=>{ $("first").value=APPLICANT.first; $("last").value=APPLICANT.last; $("country").value=APPLICANT.country; renderMatches(findMatches()); return $("matches").style.display==='block'; });
 
       out.innerHTML = results.map(r=>`<div class="${r.pass?'diag-pass':'diag-fail'}">${r.pass?'✔':'✖'} ${r.name}${r.detail!==true && r.detail!==false?`: ${r.detail}`:''}</div>`).join('');
     }
