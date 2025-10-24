@@ -65,6 +65,10 @@
 
     /* Mobile first layout: fields stacked vertically */
     .grid{display:grid;grid-template-columns:1fr;gap:12px}
+
+    /* Diagnostics card for self tests (only shows with ?selftest=1) */
+    .diag-pass{color:#065f46}
+    .diag-fail{color:#b91c1c}
   </style>
 </head>
 <body>
@@ -121,6 +125,12 @@
       </main>
 
       <footer class="foot">© <span id="year"></span> Global Database — demo for prospect review (Yoti‑themed UI). Registry cross‑check simulated. Not affiliated with Yoti.</footer>
+
+      <!-- Diagnostics container (hidden unless selftest=1) -->
+      <section class="card" id="diagnostics" style="display:none;margin-top:12px">
+        <h2>Self‑tests</h2>
+        <div id="diagResults" class="small"></div>
+      </section>
     </div>
   </div>
 
@@ -248,9 +258,11 @@
         `;
         tgt.appendChild(div);
       }
-      box.style.display='block';
+      // Animate the matches section with a 2s roll-down
+      slideDown(box, 2000);
     }
 
+    // FIXED: removed stray parentheses that caused SyntaxError
     function autoCompleteFromRegistry(){
       setTimeout(()=>{ setVal('email', APPLICANT.email); }, 800);
       setTimeout(()=>{ setVal('phone', APPLICANT.phone); }, 1500);
@@ -293,7 +305,45 @@
       $("verifyBtn").addEventListener('click', manualVerify);
       $("resetBtn").addEventListener('click', resetForm);
       $("year").textContent = new Date().getFullYear();
+
+      // Optional self-tests via ?selftest=1
+      const params = new URLSearchParams(location.search);
+      if(params.get('selftest')==='1') runSelfTests();
     });
+
+    // Smooth roll-down helper for the matches section
+    function slideDown(el, duration){
+      el.style.display = 'block';
+      el.style.overflow = 'hidden';
+      el.style.maxHeight = '0px';
+      el.style.opacity = '0';
+      el.style.transition = `max-height ${duration}ms ease, opacity ${duration}ms ease`;
+      void el.getBoundingClientRect();
+      el.style.maxHeight = el.scrollHeight + 'px';
+      el.style.opacity = '1';
+      setTimeout(()=>{
+        el.style.removeProperty('maxHeight');
+        el.style.removeProperty('overflow');
+        el.style.removeProperty('transition');
+      }, duration + 60);
+    }
+
+    // ---------- Self-tests (only if ?selftest=1) ----------
+    function runSelfTests(){
+      const out = $("diagResults"); const card=$("diagnostics"); if(!out||!card) return;
+      card.style.display='block';
+      const results = [];
+      function t(name, fn){
+        try{ const r = fn(); results.push({name, pass:!!r, detail:r}); }
+        catch(e){ results.push({name, pass:false, detail:e.message}); }
+      }
+      t('Functions present', ()=> typeof typeInto==='function' && typeof runEnrichment==='function' && typeof autoCompleteFromRegistry==='function');
+      t('Registry contents', ()=> Array.isArray(REGISTRY) && REGISTRY.length===2 && REGISTRY.some(r=>r.company.includes('Riverbank')) && REGISTRY.some(r=>r.company.includes('Northbridge')));
+      t('Applicant defaults', ()=> APPLICANT.first==='Alice' && APPLICANT.country==='GB');
+      t('Match rendering', ()=>{ $("first").value=APPLICANT.first; $("last").value=APPLICANT.last; $("country").value=APPLICANT.country; renderMatches(findMatches()); return $("matches").style.display==='block'; });
+
+      out.innerHTML = results.map(r=>`<div class="${r.pass?'diag-pass':'diag-fail'}">${r.pass?'✔':'✖'} ${r.name}${r.detail!==true && r.detail!==false?`: ${r.detail}`:''}</div>`).join('');
+    }
   </script>
 </body>
 </html>
