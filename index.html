@@ -10,7 +10,7 @@
       --card:#ffffff;         /* white */
       --ink:#0f172a;          /* slate-900 */
       --ink-dim:#475569;      /* slate-600 */
-      --accent:#1463ff;       /* Yoti-like blue */
+      --accent:#2D9FFF;  /* Yoti blue */       /* Yoti-like blue */
       --accent-ink:#ffffff;   
       --success:#059669;      /* green-600 */
       --warn:#d97706;         /* amber-600 */
@@ -67,7 +67,7 @@
   <div class="wrap">
     <header>
       <div class="brand">
-        <div class="logo" aria-hidden="true">YT</div>
+        <div class="logo" aria-hidden="true">Yoti</div>
         <div>
           <h1>Yoti Onboarding – Registry Cross‑Check (Mock)</h1>
           <div class="subtitle">Frictionless applicant capture with background KYB enrichment via Global Database (simulated)</div>
@@ -114,7 +114,7 @@
       <div class="foot">Demo only – static front‑end simulation. In production, these values would be posted to Yoti backend, which calls the Global Database API and returns signed results.</div>
     </main>
 
-    <footer class="foot">© <span id="year"></span> Yoti mock for demo purposes. Global Database registry cross‑check simulated. Not affiliated with Yoti.</footer>
+    <footer class="foot">© <span id="year"></span> Yoti demo for prospect review. Global Database registry cross‑check simulated. Not affiliated with Yoti.</footer>
   </div>
 
   <script>
@@ -185,19 +185,21 @@
     function runEnrichment(){
       clearTicker();
       const s1 = addStep('Applicant info received', 'ok');
-      const s2 = addStep('Running registry enrichment…', 'run');
-
-      // simulate network latency
+      // Let this breathe for comprehension
       setTimeout(()=>{
-        s2.classList.remove('run'); s2.classList.add('ok');
-        s2.querySelector('.dot').classList.remove('run'); s2.querySelector('.dot').classList.add('ok');
-        addStep('Response from Global Database received', 'ok');
-        // auto-complete remaining fields
-        autoCompleteFromRegistry();
+        const s2 = addStep('Running registry enrichment…', 'run');
+        // keep this visible for a bit
+        setTimeout(()=>{
+          s2.classList.remove('run'); s2.classList.add('ok');
+          s2.querySelector('.dot').classList.remove('run'); s2.querySelector('.dot').classList.add('ok');
+          const s3 = addStep('Response from Global Database received', 'ok');
+          // After message lands, auto-complete the rest
+          setTimeout(()=>{ autoCompleteFromRegistry(); }, 1200);
+        }, 2200);
       }, 900);
     }
 
-    function findMatches(){
+    function findMatches()(){
       const full = `${$("first").value}`.trim() + ' ' + `${$("last").value}`.trim();
       const country = $("country").value;
       const matches = [];
@@ -246,17 +248,31 @@
       // Clear fields
       ['first','last','email','phone','dob','country','addr1','addr2','city','state','post'].forEach(id=>{ $(id).value=''; });
 
-      // Step 1: type basic fields
-      setTimeout(()=>{ setVal('first', APPLICANT.first); }, 200);
-      setTimeout(()=>{ setVal('last', APPLICANT.last); }, 500);
-      setTimeout(()=>{ $("country").value = APPLICANT.country; $("country").classList.add('flash'); }, 800);
-      setTimeout(()=>{ setVal('addr1', APPLICANT.addr1); }, 1100);
-
-      // Then show enrichment ticker and finish rest
-      setTimeout(()=>{ runEnrichment(); }, 1300);
+      // Slow, readable typewriter for key fields
+      typeInto('first', APPLICANT.first, 80)
+        .then(()=> waitMs(600))
+        .then(()=> typeInto('last', APPLICANT.last, 80))
+        .then(()=> waitMs(600))
+        .then(()=> { $("country").value = APPLICANT.country; $("country").classList.add('flash'); })
+        .then(()=> waitMs(800))
+        .then(()=> typeInto('addr1', APPLICANT.addr1, 60))
+        .then(()=> waitMs(1000))
+        .then(()=> runEnrichment());
     }
 
     function autoCompleteFromRegistry(){
+      // Fill remaining visible fields at a human pace
+      setTimeout(()=>{ setVal('email', APPLICANT.email); }, 600);
+      setTimeout(()=>{ setVal('phone', APPLICANT.phone); }, 1200);
+      setTimeout(()=>{ setVal('dob', APPLICANT.dob); }, 1800);
+      setTimeout(()=>{ setVal('addr2', APPLICANT.addr2); }, 2200);
+      setTimeout(()=>{ setVal('city', APPLICANT.city); }, 2600);
+      setTimeout(()=>{ setVal('state', APPLICANT.state); }, 3000);
+      setTimeout(()=>{ setVal('post', APPLICANT.post); }, 3400);
+
+      // Compute matches and show after fields settle
+      setTimeout(()=>{ renderMatches(findMatches()); }, 3800);
+    }(){
       // Fill remaining visible fields smoothly
       setTimeout(()=>{ setVal('email', APPLICANT.email); }, 200);
       setTimeout(()=>{ setVal('phone', APPLICANT.phone); }, 400);
@@ -291,7 +307,18 @@
     window.addEventListener('load', ()=>{
       autoTypeSequence();
     });
+      // helpers for pacing
+    function waitMs(ms){ return new Promise(res=>setTimeout(res, ms)); }
+    function typeInto(id, text, perChar=60){
+      return new Promise(async (res)=>{
+        const el = $(id); el.value=''; el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash');
+        for(let i=1;i<=text.length;i++){
+          el.value = text.slice(0,i);
+          await waitMs(perChar);
+        }
+        res();
+      });
+    }
   </script>
 </body>
 </html>
-
